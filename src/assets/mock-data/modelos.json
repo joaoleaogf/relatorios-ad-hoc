@@ -1,0 +1,6 @@
+[
+  { "id": 1, "nome": "Uno", "marcaId": 1 },
+  { "id": 2, "nome": "Palio", "marcaId": 1 },
+  { "id": 3, "nome": "Ka", "marcaId": 2 },
+  { "id": 4, "nome": "Gol", "marcaId": 3 }
+]

@@ -1,0 +1,25 @@
+<div *ngIf="dados && dados.length > 0; else vazio">
+    <table>
+      <thead>
+        <tr>
+          <th>Veículo</th>
+          <th>Modelo</th>
+          <th>Marca</th>
+          <th>Ano</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of dados">
+          <td>{{ item.veiculo }}</td>
+          <td>{{ item.modelo }}</td>
+          <td>{{ item.marca }}</td>
+          <td>{{ item.ano }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <ng-template #vazio>
+    <p>Nenhum resultado para exibir.</p>
+  </ng-template>
+  

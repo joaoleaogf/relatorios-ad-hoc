@@ -1,0 +1,72 @@
+<h2>Relatório Ad Hoc</h2>
+
+<label>
+  Tabela principal:
+  <select [(ngModel)]="fromPrincipal">
+    <option *ngFor="let t of tabelas" [value]="t">{{ t }}</option>
+  </select>
+</label>
+
+<div *ngFor="let tabela of tabelasRelacionadas">
+  <h4>{{ tabela }}</h4>
+  <div class="checkboxes">
+    <label *ngFor="let campo of camposDisponiveis[tabela]">
+      <input type="checkbox"
+             [checked]="camposSelecionados[tabela]?.includes(campo)"
+             (change)="toggleCampo(tabela, campo)" />
+      {{ getFieldLabel(tabela + '.' + campo) }}
+    </label>
+  </div>
+</div>
+
+<h4>Condições:</h4>
+<div *ngFor="let c of conditions; let i = index" class="condicao">
+  <select [(ngModel)]="c.field">
+    <option *ngFor="let campo of camposRelacionados" [value]="campo">
+      {{ getFieldLabel(campo) }}
+    </option>
+  </select>
+
+  <select [(ngModel)]="c.operator">
+    <option *ngFor="let op of getOperadoresValidos(fieldTypes[c.field])" [value]="op">{{ op }}</option>
+  </select>
+
+  <ng-container [ngSwitch]="c.operator">
+    <ng-container *ngSwitchCase="'between'">
+      <input type="number" [(ngModel)]="c.value1" placeholder="Valor mínimo" />
+      <input type="number" [(ngModel)]="c.value2" placeholder="Valor máximo" />
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <input [type]="fieldTypes[c.field] === 'number' ? 'number' : 'text'"
+             [(ngModel)]="c.value1" placeholder="Valor" />
+    </ng-container>
+  </ng-container>
+
+  <button (click)="removerCondicao(i)">✖</button>
+</div>
+<button (click)="adicionarCondicao()">+ condição</button>
+
+<h4>Ordenação:</h4>
+<label>
+  Campo:
+  <select [(ngModel)]="orderField">
+    <option *ngFor="let campo of camposRelacionados" [value]="campo">{{ getFieldLabel(campo) }}</option>
+  </select>
+</label>
+
+<label>
+  Direção:
+  <select [(ngModel)]="orderDirection">
+    <option value="ASC">ASC</option>
+    <option value="DESC">DESC</option>
+  </select>
+</label>
+
+<div class="acoes">
+  <button (click)="gerarRelatorio()">Gerar Relatório</button>
+  <button (click)="exportarCSV()" [disabled]="!resultado.length">Exportar CSV</button>
+</div>
+
+<hr />
+
+<pre *ngIf="resultado.length">{{ resultado | json }}</pre>
