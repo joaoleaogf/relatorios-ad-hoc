@@ -12,6 +12,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { AccordionModule } from 'primeng/accordion';
 import { ChartModule } from 'primeng/chart';
+import { ReportService } from 'src/app/services/report.service';
+import { TableName } from 'src/app/models/request';
 
 type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'polarArea' | 'radar';
 
@@ -97,7 +99,7 @@ export class ReportAdhocBuilderComponent implements OnInit {
     'veiculo.mesreferencia': 'Mesreferencia'
   };
 
-  fromPrincipal: string = 'veiculo';
+  fromPrincipal: TableName = 'veiculo';
   camposSelecionados: Record<string, string[]> = {
     marca: [],
     modelo: [],
@@ -121,7 +123,7 @@ export class ReportAdhocBuilderComponent implements OnInit {
     return [...new Set([this.fromPrincipal, ...related])];
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private reportService: ReportService) {}
 
   ngOnInit(): void {
     this.updateCamposRelacionados();
@@ -162,7 +164,8 @@ export class ReportAdhocBuilderComponent implements OnInit {
     const operadores = tipo === 'text' ? ['=', 'like'] : ['=', '>', '<', 'between'];
     return operadores.map(op => ({label: op, value: op}));
   }
-  gerarRelatorio() {
+  
+  async gerarRelatorio() {
     const cond: Record<string, [string, string?, string?]> = {};
     this.conditions.forEach(c => {
       if (c.field && c.value1) {
@@ -188,41 +191,8 @@ export class ReportAdhocBuilderComponent implements OnInit {
 
     console.log('Enviando para API:', JSON.stringify(input, null, 2));
 
-    this.resultado = [
-      {
-        "modelo_codigomo": 351,
-        "modelo_modeloma": 13,
-        "modelo_nome": "Xsara VTS 2.0  16V Cupê Mec.",
-        "marca_nome": "Citroën",
-        "veiculo_preco": "20887.00",
-        "ano_periodo": 1999
-    },
-    {
-        "modelo_codigomo": 351,
-        "modelo_modeloma": 13,
-        "modelo_nome": "Xsara VTS 2.0  16V Cupê Mec.",
-        "marca_nome": "Citroën",
-        "veiculo_preco": "22495.00",
-        "ano_periodo": 2000
-    },
-    {
-        "modelo_codigomo": 351,
-        "modelo_modeloma": 13,
-        "modelo_nome": "Xsara VTS 2.0  16V Cupê Mec.",
-        "marca_nome": "Citroën",
-        "veiculo_preco": "21410.00",
-        "ano_periodo": 2000
-    },
-    {
-        "modelo_codigomo": 346,
-        "modelo_modeloma": 13,
-        "modelo_nome": "Xsara Picasso GLX/Brasil/Etoile 2.0 Mec.",
-        "marca_nome": "Citroën",
-        "veiculo_preco": "20125.00",
-        "ano_periodo": 2001
-    }
+    this.resultado = await this.reportService.gerarRelatorio(input);
 
-    ];
     this.prepareResultTable();
     this.prepareChartSelectors();
   }
