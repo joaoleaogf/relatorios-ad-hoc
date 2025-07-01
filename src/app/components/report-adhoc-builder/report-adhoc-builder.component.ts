@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ReportService } from '../../services/report.service';
+import { QueryInput, TableName } from 'src/app/models/request';
 
 @Component({
   selector: 'app-report-adhoc-builder',
@@ -22,34 +24,46 @@ export class ReportAdhocBuilderComponent {
   };
 
   camposDisponiveis: Record<string, string[]> = {
-    marca: ['codigoMa', 'nomeMa'],
-    modelo: ['codigoMo', 'nomeMo', 'modeloMa'],
-    veiculo: ['placa', 'codigoMo'],
-    ano: ['ano', 'codigoMo']
+    ano: ['codigoan', 'codigomo', 'periodo'],
+    marca: ['codigoma', 'nome'],
+    modelo: ['codigomo', 'nome', 'modeloma'],
+    veiculo: ['codigove', 'codigomo', 'combustivel', 'tipoveiculo', 'preco', 'siglacombustivel', 'mesreferencia']
   };
 
   fieldTypes: Record<string, 'text' | 'number'> = {
-    'marca.nomeMa': 'text',
-    'modelo.nomeMo': 'text',
-    'modelo.codigoMo': 'number',
-    'modelo.modeloMa': 'text',
-    'veiculo.placa': 'text',
-    'veiculo.codigoMo': 'number',
-    'ano.ano': 'number',
-    'ano.codigoMo': 'number',
-    'marca.codigoMa': 'number'
+    'ano.codigoan': 'text',
+    'ano.codigomo': 'number',
+    'ano.periodo': 'number',
+    'marca.codigoma': 'number',
+    'marca.nome': 'text',
+    'modelo.codigomo': 'number',
+    'modelo.nome': 'text',
+    'modelo.modeloma': 'number',
+    'veiculo.codigove': 'number',
+    'veiculo.codigomo': 'number',
+    'veiculo.combustivel': 'text',
+    'veiculo.tipoveiculo': 'number',
+    'veiculo.preco': 'number',
+    'veiculo.siglacombustivel': 'text',
+    'veiculo.mesreferencia': 'text'
   };
 
   fieldLabels: Record<string, string> = {
-    'marca.nomeMa': 'Nome da Marca',
-    'marca.codigoMa': 'Código da Marca',
-    'modelo.nomeMo': 'Nome do Modelo',
-    'modelo.modeloMa': 'Marca do Modelo',
-    'modelo.codigoMo': 'Código do Modelo',
-    'veiculo.placa': 'Placa do Veículo',
-    'veiculo.codigoMo': 'Código do Modelo do Veículo',
-    'ano.codigoMo': 'Código do Ano do Modelo',
-    'ano.ano': 'Ano'
+    'ano.codigoan': 'Codigoan',
+    'ano.codigomo': 'Codigomo',
+    'ano.periodo': 'Periodo',
+    'marca.codigoma': 'Codigoma',
+    'marca.nome': 'Nome',
+    'modelo.codigomo': 'Codigomo',
+    'modelo.nome': 'Nome',
+    'modelo.modeloma': 'Modeloma',
+    'veiculo.codigove': 'Codigove',
+    'veiculo.codigomo': 'Codigomo',
+    'veiculo.combustivel': 'Combustivel',
+    'veiculo.tipoveiculo': 'Tipoveiculo',
+    'veiculo.preco': 'Preco',
+    'veiculo.siglacombustivel': 'Siglacombustivel',
+    'veiculo.mesreferencia': 'Mesreferencia'
   };
 
   get tabelasRelacionadas(): string[] {
@@ -64,7 +78,7 @@ export class ReportAdhocBuilderComponent {
 
   todosCamposDisponiveis: string[] = Object.keys(this.fieldTypes);
 
-  fromPrincipal: string = 'veiculo';
+  fromPrincipal: TableName = 'veiculo';
 
   camposSelecionados: Record<string, string[]> = {};
   conditions: { field: string; operator: string; value1: string; value2?: string }[] = [];
@@ -74,7 +88,7 @@ export class ReportAdhocBuilderComponent {
 
   resultado: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private reportService: ReportService) {}
 
   toggleCampo(tabela: string, campo: string) {
     const lista = this.camposSelecionados[tabela] || [];
@@ -105,7 +119,7 @@ export class ReportAdhocBuilderComponent {
       cond[c.field] = [c.operator, c.value1, c.value2];
     }
 
-    const input = {
+    const input: QueryInput = {
       data: {
         from_principal: this.fromPrincipal,
         marca: this.camposSelecionados['marca'],
@@ -117,7 +131,7 @@ export class ReportAdhocBuilderComponent {
       }
     };
 
-    this.http.post<any[]>('/report', input).subscribe(data => {
+    this.reportService.gerarRelatorio(input).subscribe(data => {
       this.resultado = data;
     });
   }

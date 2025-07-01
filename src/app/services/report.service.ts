@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
+import { Observable } from 'rxjs';
+import { QueryInput } from '../models/request';
 
 @Injectable({
   providedIn: 'root',
@@ -20,11 +21,7 @@ export class ReportService {
     return this.http.get<number[]>('/assets/mock-data/anos.json');
   }
 
-  gerarRelatorio(filtro: any): Observable<any[]> {
-    // Simula uma resposta com filtro aplicado
-    return this.http.get<any[]>('/assets/mock-data/modelos.json').pipe(
-      delay(500),
-      // Aqui você pode filtrar manualmente depois
-    );
+  gerarRelatorio(input: QueryInput): Observable<any[]> {
+    return this.http.post<any[]>('http://localhost:3000/api/report', input);
   }
 }

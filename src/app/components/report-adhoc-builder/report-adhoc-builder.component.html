@@ -12,7 +12,7 @@
   <div class="checkboxes">
     <label *ngFor="let campo of camposDisponiveis[tabela]">
       <input type="checkbox"
-             [checked]="camposSelecionados[tabela]?.includes(campo)"
+             [checked]="camposSelecionados[tabela].includes(campo)"
              (change)="toggleCampo(tabela, campo)" />
       {{ getFieldLabel(tabela + '.' + campo) }}
     </label>
