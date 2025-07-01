@@ -55,40 +55,47 @@ export class ReportAdhocBuilderComponent implements OnInit {
   };
 
   camposDisponiveis: Record<string, string[]> = {
-    marca: ['codigoMa', 'nomeMa'],
-    modelo: ['codigoMo', 'nomeMo', 'modeloMa'],
-    veiculo: ['placa', 'codigoMo'],
-    ano: ['ano', 'codigoMo']
+    ano: ['codigoan', 'codigomo', 'periodo'],
+    marca: ['codigoma', 'nome'],
+    modelo: ['codigomo', 'nome', 'modeloma'],
+    veiculo: ['codigove', 'codigomo', 'combustivel', 'tipoveiculo', 'preco', 'siglacombustivel', 'mesreferencia']
   };
 
   fieldTypes: Record<string, 'text' | 'number'> = {
-    'marca.nomeMa': 'text',
-    'modelo.nomeMo': 'text',
-    'modelo.codigoMo': 'number',
-    'modelo.modeloMa': 'text',
-    'veiculo.placa': 'text',
-    'veiculo.codigoMo': 'number',
-    'ano.ano': 'number',
-    'ano.codigoMo': 'number',
-    'marca.codigoMa': 'number'
+    'ano.codigoan': 'text',
+    'ano.codigomo': 'number',
+    'ano.periodo': 'number',
+    'marca.codigoma': 'number',
+    'marca.nome': 'text',
+    'modelo.codigomo': 'number',
+    'modelo.nome': 'text',
+    'modelo.modeloma': 'number',
+    'veiculo.codigove': 'number',
+    'veiculo.codigomo': 'number',
+    'veiculo.combustivel': 'text',
+    'veiculo.tipoveiculo': 'number',
+    'veiculo.preco': 'number',
+    'veiculo.siglacombustivel': 'text',
+    'veiculo.mesreferencia': 'text'
   };
 
   fieldLabels: Record<string, string> = {
-    'marca': 'Marcas',
-    'modelo': 'Modelos',
-    'veiculo': 'Veículos',
-    'ano': 'Anos',
-    'marca.nomeMa': 'Nome da Marca',
-    'marca.codigoMa': 'Código da Marca',
-    'modelo.nomeMo': 'Nome do Modelo',
-    'modelo.modeloMa': 'Marca do Modelo',
-    'modelo.codigoMo': 'Código do Modelo',
-    'veiculo.placa': 'Placa do Veículo',
-    'veiculo.codigoMo': 'Código do Modelo do Veículo',
-    'ano.codigoMo': 'Código do Ano do Modelo',
-    'ano.ano': 'Ano'
+    'ano.codigoan': 'Codigoan',
+    'ano.codigomo': 'Codigomo',
+    'ano.periodo': 'Periodo',
+    'marca.codigoma': 'Codigoma',
+    'marca.nome': 'Nome',
+    'modelo.codigomo': 'Codigomo',
+    'modelo.nome': 'Nome',
+    'modelo.modeloma': 'Modeloma',
+    'veiculo.codigove': 'Codigove',
+    'veiculo.codigomo': 'Codigomo',
+    'veiculo.combustivel': 'Combustivel',
+    'veiculo.tipoveiculo': 'Tipoveiculo',
+    'veiculo.preco': 'Preco',
+    'veiculo.siglacombustivel': 'Siglacombustivel',
+    'veiculo.mesreferencia': 'Mesreferencia'
   };
-
 
   fromPrincipal: string = 'veiculo';
   camposSelecionados: Record<string, string[]> = {
