@@ -3,8 +3,6 @@ import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-import { ReportBuilderComponent } from './components/report-builder/report-builder.component';
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -12,7 +10,6 @@ import { ReportBuilderComponent } from './components/report-builder/report-build
     RouterOutlet,
     FormsModule,
     HttpClientModule,
-    ReportBuilderComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',

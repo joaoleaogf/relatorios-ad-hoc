@@ -1,72 +1,238 @@
-<h2>Relatório Ad Hoc</h2>
+<div class="p-6 sm:p-10 bg-slate-50 min-h-screen font-sans text-slate-800">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center gap-4 mb-10">
+      <i class="pi pi-chart-bar text-4xl text-indigo-600"></i>
+      <div>
+        <h2 class="text-3xl font-bold">Construtor de Relatórios Dinâmicos</h2>
+        <p class="text-slate-600 mt-1">Siga os passos para criar seu relatório personalizado.</p>
+      </div>
+    </div>
+    <p-accordion [multiple]="true" [activeIndex]="[0]" class="shadow-md rounded-lg">
+    <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-table text-xl text-indigo-500"></i>
+            <span class="font-semibold text-lg">Passo 1: Selecione a Tabela e os Campos</span>
+          </div>
+        </ng-template>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 bg-white rounded-lg">
+          <div class="md:col-span-1">
+            <h3 class="font-medium mb-2">Tabela Principal</h3>
+            <p-dropdown
+              id="fromPrincipal"
+              [options]="tabelasOptions"
+              [(ngModel)]="fromPrincipal"
+              (onChange)="onPrincipalTableChange()"
+              placeholder="Selecione a base"
+              styleClass="w-full">
+            </p-dropdown>
+          </div>
+          <div class="md:col-span-2">
+            <h3 class="font-medium mb-2">Campos para Exibir</h3>
+            <div class="flex flex-col gap-4">
+              <div *ngFor="let tabela of tabelasRelacionadas; trackBy: trackByTabela">
+                <label class="font-medium block mb-2">{{ getFieldLabel(tabela) }}</label>
+                <p-multiSelect
+                  [options]="getCamposDisponiveisOptions(tabela)"
+                  [(ngModel)]="camposSelecionados[tabela]"
+                  placeholder="Selecione os campos"
+                  display="chip"
+                  styleClass="w-full">
+                </p-multiSelect>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-accordionTab>
 
-<label>
-  Tabela principal:
-  <select [(ngModel)]="fromPrincipal">
-    <option *ngFor="let t of tabelas" [value]="t">{{ t }}</option>
-  </select>
-</label>
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-filter text-xl text-indigo-500"></i>
+            <span class="font-semibold text-lg">Passo 2: Adicione Filtros (Opcional)</span>
+          </div>
+        </ng-template>
+        <div class="p-6 bg-white rounded-lg">
+          <div class="flex justify-end mb-4">
+            <p-button
+              icon="pi pi-plus"
+              label="Adicionar Filtro"
+              (onClick)="adicionarCondicao()"
+              styleClass="p-button-sm p-button-outlined">
+            </p-button>
+          </div>
+          <div *ngIf="conditions.length === 0" class="text-center text-slate-500 py-6 border-2 border-dashed rounded-lg">
+            <i class="pi pi-info-circle text-2xl mb-2"></i>
+            <p>Nenhum filtro foi adicionado.</p>
+          </div>
+          <div class="flex flex-col gap-4">
+            <div *ngFor="let c of conditions; let i = index" class="flex flex-wrap gap-2 items-center p-4 bg-slate-50 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md">
+              <p-dropdown
+                [options]="camposRelacionadosOptions"
+                [(ngModel)]="c.field"
+                placeholder="Campo"
+                styleClass="flex-grow min-w-[200px]">
+              </p-dropdown>
+              <p-dropdown
+                [options]="getOperadoresValidos(c.field)"
+                [(ngModel)]="c.operator"
+                placeholder="Operador"
+                styleClass="flex-grow min-w-[150px]">
+              </p-dropdown>
+              <div class="flex-grow flex gap-2 min-w-[200px]">
+                <ng-container [ngSwitch]="c.operator">
+                  <ng-container *ngSwitchCase="'between'">
+                    <p-inputNumber [(ngModel)]="c.value1" placeholder="Mínimo" styleClass="w-1/2"></p-inputNumber>
+                    <p-inputNumber [(ngModel)]="c.value2" placeholder="Máximo" styleClass="w-1/2"></p-inputNumber>
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    <input *ngIf="fieldTypes[c.field] !== 'number'" pInputText [(ngModel)]="c.value1" placeholder="Valor" class="w-full" />
+                    <p-inputNumber *ngIf="fieldTypes[c.field] === 'number'" [(ngModel)]="c.value1" placeholder="Valor" styleClass="w-full"></p-inputNumber>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <p-button icon="pi pi-trash" (click)="removerCondicao(i)" styleClass="p-button-danger p-button-text"></p-button>
+            </div>
+          </div>
+        </div>
+      </p-accordionTab>
 
-<div *ngFor="let tabela of tabelasRelacionadas">
-  <h4>{{ tabela }}</h4>
-  <div class="checkboxes">
-    <label *ngFor="let campo of camposDisponiveis[tabela]">
-      <input type="checkbox"
-             [checked]="camposSelecionados[tabela]?.includes(campo)"
-             (change)="toggleCampo(tabela, campo)" />
-      {{ getFieldLabel(tabela + '.' + campo) }}
-    </label>
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-sort-alt text-xl text-indigo-500"></i>
+            <span class="font-semibold text-lg">Passo 3: Ordenar e Gerar</span>
+          </div>
+        </ng-template>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-white rounded-lg">
+          <div>
+            <h3 class="font-medium mb-2">Ordenação</h3>
+            <div class="flex gap-2">
+              <p-dropdown
+                id="orderField"
+                [options]="camposRelacionadosOptions"
+                [(ngModel)]="orderField"
+                placeholder="Ordenar por campo"
+                [showClear]="true"
+                styleClass="w-full">
+              </p-dropdown>
+              <p-dropdown
+                id="orderDirection"
+                [options]="[{label: 'ASC', value: 'ASC'}, {label: 'DESC', value: 'DESC'}]"
+                [(ngModel)]="orderDirection"
+                styleClass="min-w-[100px]">
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="flex flex-col justify-end items-end">
+            <h3 class="font-medium mb-2">Ações Finais</h3>
+            <div class="flex justify-end gap-3">
+              <p-button
+                label="Gerar Relatório"
+                icon="pi pi-cog"
+                (onClick)="gerarRelatorio()"
+                styleClass="p-button-lg p-button-primary">
+              </p-button>
+              <p-button
+                label="Exportar CSV"
+                icon="pi pi-file-export"
+                (onClick)="exportarCSV()"
+                [disabled]="!resultado.length"
+                styleClass="p-button-success p-button-lg">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+
+    <!-- RESULTADOS -->
+    <div *ngIf="resultado.length" class="mt-10">
+      <p-card class="shadow-lg border border-slate-200">
+        <ng-template pTemplate="title">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-list text-indigo-500"></i>
+            <span class="font-semibold">Resultado do Relatório</span>
+          </div>
+        </ng-template>
+        <p-table
+          [value]="resultado"
+          [columns]="resultColumns"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} resultados"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          class="p-datatable-striped">
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns" class="bg-slate-100">{{ col.header }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+              <td *ngFor="let col of columns">{{ rowData[col.field] }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    <p-card>
+  <ng-template pTemplate="title">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-chart-line text-indigo-500"></i>
+      <span class="font-medium">Visualização Gráfica</span>
+    </div>
+  </ng-template>
+
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+  <div>
+    <label class="block text-sm text-slate-600 font-medium mb-1">Eixo X (Campo Principal):</label>
+    <p-dropdown
+      [options]="chartCategoryFields"
+      [(ngModel)]="chartLabelField"
+      (onChange)="generateChart()"
+      placeholder="Selecione"
+      styleClass="w-full p-inputtext-sm">
+    </p-dropdown>
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600 font-medium mb-1">Agrupar por (Segundo Campo):</label>
+    <p-dropdown
+      [options]="chartCategoryFields"
+      [(ngModel)]="chartGroupField"
+      (onChange)="generateChart()"
+      placeholder="(Opcional)"
+      styleClass="w-full p-inputtext-sm">
+    </p-dropdown>
+  </div>
+  <div>
+    <label class="block text-sm text-slate-600 font-medium mb-1">Somar Campo Numérico (Opcional):</label>
+    <p-dropdown
+      [options]="chartNumericFields"
+      [(ngModel)]="chartDataField"
+      (onChange)="generateChart()"
+      placeholder="Contar Registros"
+      styleClass="w-full p-inputtext-sm">
+    </p-dropdown>
   </div>
 </div>
 
-<h4>Condições:</h4>
-<div *ngFor="let c of conditions; let i = index" class="condicao">
-  <select [(ngModel)]="c.field">
-    <option *ngFor="let campo of camposRelacionados" [value]="campo">
-      {{ getFieldLabel(campo) }}
-    </option>
-  </select>
 
-  <select [(ngModel)]="c.operator">
-    <option *ngFor="let op of getOperadoresValidos(fieldTypes[c.field])" [value]="op">{{ op }}</option>
-  </select>
+  <div *ngIf="chartData" class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+    <p-chart
+      [type]="chartType"
+      [data]="chartData"
+      [options]="chartOptions">
+    </p-chart>
+  </div>
 
-  <ng-container [ngSwitch]="c.operator">
-    <ng-container *ngSwitchCase="'between'">
-      <input type="number" [(ngModel)]="c.value1" placeholder="Valor mínimo" />
-      <input type="number" [(ngModel)]="c.value2" placeholder="Valor máximo" />
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      <input [type]="fieldTypes[c.field] === 'number' ? 'number' : 'text'"
-             [(ngModel)]="c.value1" placeholder="Valor" />
-    </ng-container>
-  </ng-container>
+  <div *ngIf="!chartData" class="text-center text-slate-500 py-6 border-2 border-dashed rounded-lg">
+    <i class="pi pi-exclamation-triangle text-2xl mb-2"></i>
+    <p>Selecione os campos para gerar o gráfico.</p>
+  </div>
+</p-card>
 
-  <button (click)="removerCondicao(i)">✖</button>
+    </div>
+  </div>
 </div>
-<button (click)="adicionarCondicao()">+ condição</button>
-
-<h4>Ordenação:</h4>
-<label>
-  Campo:
-  <select [(ngModel)]="orderField">
-    <option *ngFor="let campo of camposRelacionados" [value]="campo">{{ getFieldLabel(campo) }}</option>
-  </select>
-</label>
-
-<label>
-  Direção:
-  <select [(ngModel)]="orderDirection">
-    <option value="ASC">ASC</option>
-    <option value="DESC">DESC</option>
-  </select>
-</label>
-
-<div class="acoes">
-  <button (click)="gerarRelatorio()">Gerar Relatório</button>
-  <button (click)="exportarCSV()" [disabled]="!resultado.length">Exportar CSV</button>
-</div>
-
-<hr />
-
-<pre *ngIf="resultado.length">{{ resultado | json }}</pre>
