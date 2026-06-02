@@ -1,27 +1,44 @@
-# Sandbox
+# Relatórios Ad-Hoc
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.0.
+> Construtor de relatórios **ad-hoc** em Angular + PrimeNG: monte consultas escolhendo campos, filtros e agrupamentos, e visualize o resultado em tabela dinâmica e gráficos.
 
-## Development server
+![Angular](https://img.shields.io/badge/Angular-18-DD0031?logo=angular&logoColor=white)
+![PrimeNG](https://img.shields.io/badge/PrimeNG-UI-007ad9)
+![Chart.js](https://img.shields.io/badge/Chart.js-charts-FF6384?logo=chartdotjs&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue)
 
-Run `ng serve` for a dev server. Navigate to http://localhost:4200. The application will automatically reload if you change any of the source files.
+## Visão geral
 
-## Code scaffolding
+Ferramenta que permite ao usuário montar relatórios **sob demanda** sem escrever código: seleciona dimensões e métricas, aplica filtros e obtém o resultado em uma tabela navegável (e visualizações). Útil para explorar bases tabulares de forma flexível.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Builder** de consulta com campos, filtros e agrupamentos;
+- **Tabela de resultados** dinâmica;
+- Visualizações com **Chart.js**;
+- UI com **PrimeNG**.
 
-## Build
+## Stack
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+`Angular 18` · `TypeScript` · `PrimeNG` · `Chart.js` · `RxJS`
 
-## Running unit tests
+## Estrutura
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+| Caminho | Papel |
+|---|---|
+| `components/report-adhoc-builder` | Montagem da consulta (campos, filtros) |
+| `components/result-table` | Renderização tabular do resultado |
+| `services/report.service.ts` | Orquestra a requisição/montagem do relatório |
+| `models/request.ts` | Contrato da requisição de relatório |
 
-## Running end-to-end tests
+## Como rodar
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm install
+ng serve
+# abra http://localhost:4200
+```
 
-## Further help
+> Os dados em `src/assets/mock-data/` são mocks para demonstração do builder.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Licença
+
+[MIT](LICENSE) © João Leão
